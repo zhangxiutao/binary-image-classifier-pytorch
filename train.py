@@ -7,13 +7,17 @@ import matplotlib.pyplot as plt
 import cnn
 import os.path
 
-datasetPath = 'baustelle_splitted'
+datasetPath = './dataSet/nndataset_splitted'
 # how many samples per batch to load
-batch_size = 32
+batch_size = 10
 # percentage of training set to use as validation
-test_size = 0.3
-valid_size = 0.1
+test_size = 0.2
+valid_size = 0.2
 showBatchImages = False
+
+# number of epochs to train the model
+n_epochs = 100 # you may increase this number to train a final model
+
 # helper function to un-normalize and display an image
 def imshow(img):
     img = img / 2 + 0.5  # unnormalize
@@ -25,14 +29,14 @@ if __name__ == '__main__':
     transform = transforms.Compose([
         transforms.RandomHorizontalFlip(),
         transforms.RandomRotation(20),
-        transforms.Resize(size=(224,224)),
+        transforms.Resize(size=(95,35)), #num of rows, num of colums
         transforms.ToTensor(),
-        transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))
+        #transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))
         ])
 
     trainData = datasets.ImageFolder(os.path.join('.',datasetPath,'train'),transform=transform)
     valData = datasets.ImageFolder(os.path.join('.',datasetPath,'val'),transform=transform)
-
+    print(trainData.class_to_idx)
     train_loader = torch.utils.data.DataLoader(trainData, batch_size=batch_size,
         shuffle=True, num_workers=1)
     valid_loader = torch.utils.data.DataLoader(valData, batch_size=batch_size, 
@@ -69,8 +73,6 @@ if __name__ == '__main__':
     # specify optimizer
     optimizer = torch.optim.SGD(model.parameters(), lr = 0.003, momentum= 0.9)
 
-    # number of epochs to train the model
-    n_epochs = 10 # you may increase this number to train a final model
 
     valid_loss_min = np.Inf # track change in validation loss
 
@@ -110,6 +112,7 @@ if __name__ == '__main__':
             if train_on_gpu:
                 data, target = data.cuda(), target.cuda()
             # forward pass: compute predicted outputs by passing inputs to the model
+            print(data)
             output = model(data)
             # calculate the batch loss
             loss = criterion(output, target)

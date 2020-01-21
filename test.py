@@ -7,30 +7,28 @@ import cnn
 import numpy as np
 import matplotlib.pyplot as plt
 
-datasetPath = 'baustelle_splitted'
+datasetPath = './dataSet/nndataset_splitted'
 classes = [0,1]
 # how many samples per batch to load
 batch_size = 2
 # percentage of training set to use as validation
 test_size = 0.3
 valid_size = 0.1
-showBatchImages = True
+showBatchImages = False
 train_on_gpu = torch.cuda.is_available()
 # helper function to un-normalize and display an image
 def imshow(img):
+    print(np.transpose(img, (1, 2, 0)).shape)
+
     img = img / 2 + 0.5  # unnormalize
     plt.imshow(np.transpose(img, (1, 2, 0)))  # convert from Tensor image
 
 if __name__ == '__main__':
 
-    if train_on_gpu:
-        model = cnn.Net()
-        model.cuda()
-
     transform = transforms.Compose([
         transforms.RandomHorizontalFlip(),
         transforms.RandomRotation(20),
-        transforms.Resize(size=(224,224)),
+        transforms.Resize(size=(95,35)), #num of rows, num of colums
         transforms.ToTensor(),
         transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))
         ])
@@ -61,7 +59,13 @@ if __name__ == '__main__':
     class_correct = list(0. for i in range(2))
     class_total = list(0. for i in range(2))
 
+
+    model = cnn.Net()
+    model.load_state_dict(torch.load("model_cifar.pt"))
+    if train_on_gpu:      
+        model.cuda()
     model.eval()
+
     i=1
     # iterate over test data
     #print(len(test_loader)) #how many batches
@@ -75,6 +79,7 @@ if __name__ == '__main__':
         if train_on_gpu:
             data, target = data.cuda(), target.cuda()
         # forward pass: compute predicted outputs by passing inputs to the model
+        print(data)
         output = model(data)
         # calculate the batch loss
         loss = criterion(output, target)
@@ -86,9 +91,7 @@ if __name__ == '__main__':
         print("output",pred)
         # compare predictions to true label
         correct_tensor = pred.eq(target.data.view_as(pred))
-        print("correct_tensor",correct_tensor)
         correct = np.squeeze(correct_tensor.numpy()) if not train_on_gpu else np.squeeze(correct_tensor.cpu().numpy())
-        print(correct)
         # calculate test accuracy for each object class
         #print(target)
         
