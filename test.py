@@ -6,7 +6,9 @@ import os.path
 import cnn
 import numpy as np
 import matplotlib.pyplot as plt
+import uuid
 
+filename = uuid.uuid4().hex
 datasetPath = './dataSet/nndataset_splitted'
 classes = [0,1]
 # how many samples per batch to load
@@ -79,7 +81,6 @@ if __name__ == '__main__':
         if train_on_gpu:
             data, target = data.cuda(), target.cuda()
         # forward pass: compute predicted outputs by passing inputs to the model
-        print(data)
         output = model(data)
         # calculate the batch loss
         loss = criterion(output, target)

@@ -31,7 +31,7 @@ if __name__ == '__main__':
         transforms.RandomRotation(20),
         transforms.Resize(size=(95,35)), #num of rows, num of colums
         transforms.ToTensor(),
-        #transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))
+        transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))
         ])
 
     trainData = datasets.ImageFolder(os.path.join('.',datasetPath,'train'),transform=transform)
@@ -112,7 +112,7 @@ if __name__ == '__main__':
             if train_on_gpu:
                 data, target = data.cuda(), target.cuda()
             # forward pass: compute predicted outputs by passing inputs to the model
-            print(data)
+            
             output = model(data)
             # calculate the batch loss
             loss = criterion(output, target)
@@ -132,5 +132,5 @@ if __name__ == '__main__':
             print('Validation loss decreased ({:.6f} --> {:.6f}).  Saving model ...'.format(
             valid_loss_min,
             valid_loss))
-            torch.save(model.state_dict(), 'model_cifar.pt')
+            torch.save(model.state_dict(), 'nn_model.pt')
             valid_loss_min = valid_loss
